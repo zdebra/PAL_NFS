@@ -11,6 +11,7 @@ struct State {
 struct Edge {
     Edge *next;
     int end_index;
+    bool is_empty = true;
 };
 
 
@@ -33,20 +34,21 @@ int main() {
         states[i].heads = new Edge[alphabet_size];
 
         for(int j=0;j<alphabet_size;j++) {
-            Edge *cur = &states[i].heads[j];
-
             char character;
             scanf(" %c",&character);
 
+            Edge *cur = &states[i].heads[j];
+            int iter = 0;
             int symbol; char ch;
-            // try to read first
-
-
-
             while(scanf("%c",&ch) > 0 && ch != '\n' && scanf("%d",&symbol) > 0) {
-                cur->next = new Edge();
-                cur = cur->next;
+                if(iter==0) {
+                    states[i].heads[j].is_empty = false;
+                } else {
+                    cur->next = new Edge();
+                    cur = cur->next;
+                }
                 cur->end_index = symbol;
+                iter++;
             }
 
         }
@@ -66,10 +68,13 @@ int main() {
 
             std::cout << "char: " << j << "| ";
             Edge *cur = &states[i].heads[j];
-            while(cur!=NULL) {
-                std::cout << cur->end_index << ", ";
-                cur = cur->next;
+            if(!cur->is_empty) {
+                while (cur != NULL) {
+                    std::cout << cur->end_index << ", ";
+                    cur = cur->next;
+                }
             }
+
             std::cout << std::endl;
 
         }
