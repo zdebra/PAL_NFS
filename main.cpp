@@ -10,7 +10,7 @@ struct State {
 
 struct Edge {
     Edge *next;
-    State *end;
+    int end_index;
 };
 
 
@@ -33,27 +33,53 @@ int main() {
         states[i].heads = new Edge[alphabet_size];
 
         for(int j=0;j<alphabet_size;j++) {
-            Edge cur = states[i].heads[j];
+            Edge *cur = &states[i].heads[j];
 
             char character;
             scanf(" %c",&character);
 
             int symbol; char ch;
-            while(scanf("%c",&ch) > 0 && ch != 0x0a && scanf("%d",&symbol) > 0) {
-                cur.end = &states[symbol];
-                cur.next = new Edge;
-                cur = *cur.next;
+            // try to read first
+
+
+
+            while(scanf("%c",&ch) > 0 && ch != '\n' && scanf("%d",&symbol) > 0) {
+                cur->next = new Edge();
+                cur = cur->next;
+                cur->end_index = symbol;
             }
 
         }
 
     }
 
+
     // todo read prefix here
 
 
 
-    delete [] states;
+    for(int i=0;i<states_count;i++) {
+
+        std::cout << "STATE: " << i << std::endl;
+
+        for(int j=0;j<alphabet_size;j++) {
+
+            std::cout << "char: " << j << "| ";
+            Edge *cur = &states[i].heads[j];
+            while(cur!=NULL) {
+                std::cout << cur->end_index << ", ";
+                cur = cur->next;
+            }
+            std::cout << std::endl;
+
+        }
+
+    }
+
+
+
+
+        delete [] states;
 
     return 0;
 }
