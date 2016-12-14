@@ -2,6 +2,9 @@
 
 struct Edge;
 struct State;
+void clear_array(bool *array, int len);
+void init_array(bool *array, int len);
+int PREFIX_LEN = 1000;
 
 struct State {
     bool is_final = false;
@@ -14,6 +17,7 @@ struct Edge {
     bool is_empty = true;
 };
 
+bool* REF_ARRAY;
 
 int main() {
 
@@ -25,6 +29,8 @@ int main() {
     std::cin >> alphabet_size;
 
     states = new State[states_count];
+    REF_ARRAY = new bool[states_count];
+    init_array(REF_ARRAY, states_count);
 
     for(int i=0;i<states_count;i++) {
 
@@ -55,11 +61,16 @@ int main() {
 
     }
 
+    // reading a prefix
+    char prefix[PREFIX_LEN];
+    scanf("%s",&prefix);
 
-    // todo read prefix here
+    bool active[states_count];
+    bool reachable[states_count];
 
 
 
+    /*
     for(int i=0;i<states_count;i++) {
 
         std::cout << "STATE: " << i << std::endl;
@@ -81,10 +92,24 @@ int main() {
 
     }
 
+    std::cout << prefix << std::endl;
+    */
 
 
 
-        delete [] states;
+    delete [] states;
 
     return 0;
+}
+
+void clear_array(bool *array, int len) {
+
+    memcpy(array,REF_ARRAY,len);
+
+}
+
+void init_array(bool* array, int len) {
+    for(int i=0; i<len; i++) {
+        array[i] = false;
+    }
 }
