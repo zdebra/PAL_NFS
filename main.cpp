@@ -5,7 +5,7 @@ struct State;
 void copy_array(bool *dest, bool* source, int len);
 void clear_array(bool *dest, int len);
 void init_array(bool *array, int len);
-int fill_reachable(bool *dest, bool *active, State *states, int char_index, int len);
+int fill_reachable(bool *dest, bool *active, State *states, int char_index, int len, int alphabet_size);
 int str_len(char* str);
 
 int PREFIX_LEN = 1000;
@@ -85,18 +85,29 @@ int main() {
     for(int i=0;i<len;i++) {
 
         // fills reachable states
-        fill_reachable(reachable, active, states, prefix[i]-ASCI_DIFF, states_count);
+        fill_reachable(reachable, active, states, prefix[i]-ASCI_DIFF, states_count, alphabet_size);
 
         // copy from reachable to active
         copy_array(active,reachable,states_count);
 
     }
 
+    // going through rest of automata until there is at least one active state
+    int active_state_count = fill_reachable(reachable, active, states, -1, states_count, alphabet_size);
+    while(active_state_count > 0) {
+        copy_array(active,reachable,states_count);
+        active_state_count = fill_reachable(reachable, active, states, -1, states_count, alphabet_size);
+    }
+
+    // print output
+    std::cout << MIN << " " << MAX << std::endl;
+
+/*
     for(int i=0;i<states_count;i++) {
         std::cout << active[i] << std::endl;
     }
 
-    /*
+
     for(int i=0;i<states_count;i++) {
 
         std::cout << "STATE: " << i << std::endl;
@@ -142,7 +153,7 @@ void init_array(bool* array, int len) {
     }
 }
 
-int fill_reachable(bool *dest, bool *active, State *states, int char_index, int len) {
+int fill_reachable(bool *dest, bool *active, State *states, int char_index, int len, int alphabet_size) {
 
     int count = 0;
     ITER++;
@@ -150,42 +161,72 @@ int fill_reachable(bool *dest, bool *active, State *states, int char_index, int 
     // clear dest array
     clear_array(dest, len);
 
+    /*
+    std::cout << "ITER: " << ITER << ", ACTIVE" << std::endl;
+    for(int i=0;i<len;i++) {
+        std::cout << active[i] << std::endl;
+    }
+    std::cout << "**" << std::endl;
+    */
     // going through all active states
     for(int i=0; i<len; i++) {
 
         if(active[i]) {
             count++;
-            Edge *cur = &states[i].heads[char_index];
-            if(!states[i].heads->is_empty) {
-                // going through all state's edges
-                while (cur != NULL) {
-                    dest[cur->end_index] = true;
+            if(char_index < 0) {
 
-                    // check min/max here if the state is final
-                    if(char_index < 0 && states[cur->end_index].is_final) {
-                        if(MIN==0||ITER<MIN) {
-                            MIN = ITER;
-                        }
-                        if(ITER>MAX) {
-                            MAX = ITER;
+                // for each character
+                for(int j=0; j<alphabet_size; j++) {
+
+                    Edge *cur = &states[i].heads[j];
+                    if(!states[i].heads[j].is_empty) {
+                        // going through all state's edges
+                        while (cur != NULL) {
+                            dest[cur->end_index] = true;
+
+                            // check min/max here if the state is final
+                            if(states[cur->end_index].is_final) {
+                                if(MIN==0||ITER<MIN) {
+                                    MIN = ITER;
+                                }
+                                if(ITER>MAX) {
+                                    MAX = ITER;
+                                }
+                            }
+
+                            cur = cur->next;
                         }
                     }
 
-                    cur = cur->next;
                 }
+
+            } else {
+
+                Edge *cur = &states[i].heads[char_index];
+                if(!states[i].heads[char_index].is_empty) {
+                    // going through all state's edges
+                    while (cur != NULL) {
+                        dest[cur->end_index] = true;
+                        cur = cur->next;
+                    }
+                }
+
             }
 
+
         }
+
+
 
     }
 
     /*
+    std::cout << "ITER: " << ITER << ", REACHABLE:" << std::endl;
     for(int i=0;i<len;i++) {
-        std::cout << active[i] << std::endl;
+        std::cout << dest[i] << std::endl;
     }
-
-    std::cout << "aloha" << std::endl;
-
+    std::cout << "----" << std::endl;
+    std::cout << "----" << std::endl;
     */
     return count;
 
