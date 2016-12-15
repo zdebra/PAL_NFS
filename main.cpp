@@ -43,26 +43,39 @@ int main() {
     for(int i=0;i<states_count;i++) {
 
         int state; char is_final;
-        scanf("%d %c", &state, &is_final);
+        scanf(" %d %c", &state, &is_final);
         states[i].is_final = is_final == 'F';
         states[i].heads = new Edge[alphabet_size];
 
         for(int j=0;j<alphabet_size;j++) {
-            char character;
-            scanf(" %c",&character);
+            scanf(" %*c");
 
             Edge *cur = &states[i].heads[j];
             int iter = 0;
-            int symbol; char ch;
-            while(scanf("%c",&ch) > 0 && ch != '\n' && scanf("%d",&symbol) > 0) {
-                if(iter==0) {
-                    states[i].heads[j].is_empty = false;
-                } else {
-                    cur->next = new Edge();
-                    cur = cur->next;
+            int symbol; int ch;
+            //char *seq = new char[3];
+            while((ch=getc(stdin)) == ' ') {
+            }
+            if(ch!='\n') {
+
+                ungetc(ch, stdin);
+
+                while (scanf("%d", &symbol) > 0) {
+                    if (iter == 0) {
+                        states[i].heads[j].is_empty = false;
+                    } else {
+                        cur->next = new Edge();
+                        cur = cur->next;
+                    }
+                    cur->end_index = symbol;
+                    iter++;
+                    while ((ch = getc(stdin)) == ' ') {
+                    }
+                    if (ch == '\n') {
+                        break;
+                    }
+                    ungetc(ch, stdin);
                 }
-                cur->end_index = symbol;
-                iter++;
             }
 
         }
@@ -74,6 +87,31 @@ int main() {
     scanf("%s",prefix);
     int len = str_len(prefix);
 
+    /*
+    for(int i=0;i<states_count;i++) {
+
+        std::cout << "STATE: " << i << std::endl;
+
+        for(int j=0;j<alphabet_size;j++) {
+
+            std::cout << "char: " << j << "| ";
+            Edge *cur = &states[i].heads[j];
+            if(!cur->is_empty) {
+                while (cur != NULL) {
+                    std::cout << cur->end_index << ", ";
+                    cur = cur->next;
+                }
+            }
+
+            std::cout << std::endl;
+
+        }
+
+    }
+
+    std::cout << prefix << ", " << len << std::endl;
+
+    return 1; */
     bool active[states_count];
     bool reachable[states_count];
 
